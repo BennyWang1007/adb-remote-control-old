@@ -46,11 +46,19 @@ public class Utils {
             Process process = new ProcessBuilder("adb", "-s", deviceName, "shell", "wm", "size").start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
+            int[] size = null;
             while ((line = reader.readLine()) != null) {
                 if (line.contains("Physical size:")) {
                     String[] parts = line.split(":")[1].trim().split("x");
+                    size = new int[] {Integer.parseInt(parts[0]), Integer.parseInt(parts[1])};
+                }
+                if (line.contains("Override size:")) {
+                    String[] parts = line.split(":")[1].trim().split("x");
                     return new int[] {Integer.parseInt(parts[0]), Integer.parseInt(parts[1])};
                 }
+            }
+            if (size != null) {
+                return size;
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to get screen size", e);
